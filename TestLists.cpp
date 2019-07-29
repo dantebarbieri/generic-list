@@ -77,6 +77,7 @@ void TestLists::testLinkedListEquality(void) {
   CPPUNIT_ASSERT(a == LinkedList<int>());
   CPPUNIT_ASSERT(a != LinkedList<int>(1));
   CPPUNIT_ASSERT(c == LinkedList<int>(1));
+  CPPUNIT_ASSERT(c != LinkedList<int>());
   CPPUNIT_ASSERT(c != LinkedList<int>(2));
   CPPUNIT_ASSERT(c != LinkedList<int>({1, 1}));
   CPPUNIT_ASSERT(e == LinkedList<int>({1, 1}));
@@ -86,12 +87,13 @@ void TestLists::testLinkedListEquality(void) {
   CPPUNIT_ASSERT(b == LinkedList<string>());
   CPPUNIT_ASSERT(b != LinkedList<string>("A"));
   CPPUNIT_ASSERT(d == LinkedList<string>("A"));
+  CPPUNIT_ASSERT(d != LinkedList<string>());
   CPPUNIT_ASSERT(d != LinkedList<string>("B"));
   CPPUNIT_ASSERT(d != LinkedList<string>({"A", "A"}));
   CPPUNIT_ASSERT(f == LinkedList<string>({"A", "A"}));
   CPPUNIT_ASSERT(f != LinkedList<string>({"A", "B"}));
   CPPUNIT_ASSERT(f != LinkedList<string>({"B", "A"}));
-  CPPUNIT_ASSERT(f != LinkedList<string>({"A", "A"}));
+  CPPUNIT_ASSERT(f != LinkedList<string>({"B", "B"}));
 }
 
 void TestLists::testLinkedListIsEmpty(void) {
@@ -125,44 +127,32 @@ void TestLists::testLinkedListLength(void) {
 void TestLists::testLinkedListAppend(void) {
   LinkedList<int> a;
   LinkedList<string> b;
-  a.append(1);
-  CPPUNIT_ASSERT(a == LinkedList<int>(1));
-  a.append(2);
-  CPPUNIT_ASSERT(a == LinkedList<int>({1, 2}));
-  b.append("A");
-  CPPUNIT_ASSERT(b == LinkedList<string>("A"));
-  b.append("B");
-  CPPUNIT_ASSERT(b == LinkedList<string>({"A", "B"}));
+  CPPUNIT_ASSERT(LinkedList<int>(1) == a.append(1));
+  CPPUNIT_ASSERT(LinkedList<int>({1, 2}) == a.append(2));
+  CPPUNIT_ASSERT(LinkedList<string>("A") == b.append("A"));
+  CPPUNIT_ASSERT(LinkedList<string>({"A", "B"}) == b.append("B"));
 }
 
 void TestLists::testLinkedListPrepend(void) {
   LinkedList<int> a;
   LinkedList<string> b;
-  a.prepend(1);
-  CPPUNIT_ASSERT(a == LinkedList<int>(1));
-  a.prepend(2);
-  CPPUNIT_ASSERT(a == LinkedList<int>({2, 1}));
-  b.prepend("A");
-  CPPUNIT_ASSERT(b == LinkedList<string>("A"));
-  b.prepend("B");
-  CPPUNIT_ASSERT(b == LinkedList<string>({"B", "A"}));
+  CPPUNIT_ASSERT(LinkedList<int>(1) == a.prepend(1));
+  CPPUNIT_ASSERT(LinkedList<int>({2, 1}) == a.prepend(2));
+  CPPUNIT_ASSERT(LinkedList<string>("A") == b.prepend("A"));
+  CPPUNIT_ASSERT(LinkedList<string>({"B", "A"}) == b.prepend("B"));
 }
 
 void TestLists::testLinkedListInsert(void) {
-  LinkedList<int> a(1);
-  LinkedList<string> b("A");
-  a.insert(0, 0);
-  CPPUNIT_ASSERT(a == LinkedList<int>({0, 1}));
-  a.insert(3, 2);
-  CPPUNIT_ASSERT(a == LinkedList<int>({0, 1, 3}));
-  a.insert(2, 2);
-  CPPUNIT_ASSERT(a == LinkedList<int>({0, 1, 2, 3}));
-  b.insert(" ", 0);
-  CPPUNIT_ASSERT(b == LinkedList<string>({" ", "A"}));
-  b.insert("C", 2);
-  CPPUNIT_ASSERT(b == LinkedList<string>({" ", "A", "C"}));
-  b.insert("B", 2);
-  CPPUNIT_ASSERT(b == LinkedList<string>({" ", "A", "B", "C"}));
+  LinkedList<int> a;
+  LinkedList<string> b;
+  CPPUNIT_ASSERT(LinkedList<int>(1) == a.insert(1, 0));
+  CPPUNIT_ASSERT(LinkedList<int>({0, 1}) == a.insert(0, 0));
+  CPPUNIT_ASSERT(LinkedList<int>({0, 1, 3}) == a.insert(3, 2));
+  CPPUNIT_ASSERT(LinkedList<int>({0, 1, 2, 3}) == a.insert(2, 2));
+  CPPUNIT_ASSERT(LinkedList<string>("A") == b.insert("A", 0));
+  CPPUNIT_ASSERT(LinkedList<string>({" ", "A"}) == b.insert(" ", 0));
+  CPPUNIT_ASSERT(LinkedList<string>({" ", "A", "C"}) == b.insert("C", 2));
+  CPPUNIT_ASSERT(LinkedList<string>({" ", "A", "B", "C"}) == b.insert("B", 2));
 }
 
 void TestLists::testLinkedListOutput(void) {
@@ -170,26 +160,32 @@ void TestLists::testLinkedListOutput(void) {
   output << LinkedList<int>();
   CPPUNIT_ASSERT("[]" == output.str());
   output.str(std::string());
-  output << LinkedList<int>(1);;
+  output << LinkedList<int>(1);
   CPPUNIT_ASSERT("[1]" == output.str());
   output.str(std::string());
-  output << LinkedList<int>({1, 2});;
+  output << LinkedList<int>({1, 2});
   CPPUNIT_ASSERT("[1->2]" == output.str());
+  output.str(std::string());
+  output << LinkedList<int>({1, 2, 3});
+  CPPUNIT_ASSERT("[1->2->3]" == output.str());
   output.str(std::string());
   output << LinkedList<string>();
   CPPUNIT_ASSERT("[]" == output.str());
   output.str(std::string());
-  output << LinkedList<string>("A");;
+  output << LinkedList<string>("A");
   CPPUNIT_ASSERT("[A]" == output.str());
   output.str(std::string());
-  output << LinkedList<string>({"A", "B"});;
+  output << LinkedList<string>({"A", "B"});
   CPPUNIT_ASSERT("[A->B]" == output.str());
+  output.str(std::string());
+  output << LinkedList<string>({"A", "B", "C"});
+  CPPUNIT_ASSERT("[A->B->C]" == output.str());
   output.str(std::string());
 }
 
 void TestLists::testLinkedListAccess(void) {
-  LinkedList<int> a({1, 2});
-  LinkedList<string> b({"A", "B"});
+  const LinkedList<int> a({1, 2});
+  const LinkedList<string> b({"A", "B"});
   CPPUNIT_ASSERT(a[0] == 1);
   CPPUNIT_ASSERT(a[1] == 2);
   CPPUNIT_ASSERT_THROW(a[2], exception);
@@ -200,40 +196,64 @@ void TestLists::testLinkedListAccess(void) {
 
 void TestLists::testLinkedListRemoveSingle(void) {
   LinkedList<int> a({1, 2, 3, 2, 1});
-  a.remove(2);
+  int b;
+  LinkedList<string> c({"A", "B", "C", "B", "A"});
+  string d;
+  b = a.remove(2);
   CPPUNIT_ASSERT(a == LinkedList<int>({1, 2, 2, 1}));
-  a.remove(2);
+  CPPUNIT_ASSERT(b == 3);
+  b = a.remove(2);
   CPPUNIT_ASSERT(a == LinkedList<int>({1, 2, 1}));
-  a.remove(0);
+  CPPUNIT_ASSERT(b == 2);
+  b = a.remove(0);
   CPPUNIT_ASSERT(a == LinkedList<int>({2, 1}));
-  a.remove(1);
+  CPPUNIT_ASSERT(b == 1);
+  b = a.remove(1);
   CPPUNIT_ASSERT(a == LinkedList<int>(2));
+  CPPUNIT_ASSERT(b == 1);
   CPPUNIT_ASSERT_THROW(a.remove(1), exception);
-  a.remove(0);
+  b = a.remove(0);
   CPPUNIT_ASSERT(a == LinkedList<int>());
+  CPPUNIT_ASSERT(b == 2);
   CPPUNIT_ASSERT_THROW(a.remove(0), exception);
+  d = c.remove(2);
+  CPPUNIT_ASSERT(c == LinkedList<string>({"A", "B", "B", "A"}));
+  CPPUNIT_ASSERT(d == "C");
+  d = c.remove(2);
+  CPPUNIT_ASSERT(c == LinkedList<string>({"A", "B", "A"}));
+  CPPUNIT_ASSERT(d == "B");
+  d = c.remove(0);
+  CPPUNIT_ASSERT(c == LinkedList<string>({"B", "A"}));
+  CPPUNIT_ASSERT(d == "A");
+  d = c.remove(1);
+  CPPUNIT_ASSERT(c == LinkedList<string>("B"));
+  CPPUNIT_ASSERT(d == "A");
+  CPPUNIT_ASSERT_THROW(c.remove(1), exception);
+  d = c.remove(0);
+  CPPUNIT_ASSERT(c == LinkedList<string>());
+  CPPUNIT_ASSERT(d == "B");
+  CPPUNIT_ASSERT_THROW(c.remove(0), exception);
 }
 
 void TestLists::testLinkedListRemoveMultiple(void) {
-  LinkedList<int> a({1, 2, 3, 4, 5, 6, 7, 4, 3, 2, 1});
-  a.remove(7, 100);
-  CPPUNIT_ASSERT(LinkedList<int>({1, 2, 3, 4, 5, 6, 4, 3, 2, 1}) == a);
-  a.remove(7, 1);
-  CPPUNIT_ASSERT(LinkedList<int>({1, 2, 3, 4, 5, 6, 4, 3, 2, 1}) == a);
-  a.remove(7, 0);
-  CPPUNIT_ASSERT(LinkedList<int>({1, 2, 3, 4, 5, 6, 4, 3, 2, 1}) == a);
-  a.remove(7, -1);
-  CPPUNIT_ASSERT(LinkedList<int>({1, 2, 3, 4, 5, 6, 4, 3, 2, 1}) == a);
-  a.remove(2, 0);
-  CPPUNIT_ASSERT(LinkedList<int>({1, 2, 3, 4, 5, 6, 4, 3, 2, 1}) == a);
-  a.remove(2, 1);
-  CPPUNIT_ASSERT(LinkedList<int>({1, 3, 4, 5, 6, 4, 3, 2, 1}) == a);
-  a.remove(3, 2);
-  CPPUNIT_ASSERT(LinkedList<int>({1, 4, 5, 6, 4, 2, 1}) == a);
-  a.remove(1, 2);
-  CPPUNIT_ASSERT(LinkedList<int>({4, 5, 6, 4, 2}) == a);
-  a.remove(4, -1);
-  CPPUNIT_ASSERT(LinkedList<int>({5, 6, 2}) == a);
+  LinkedList<int> a({1, 1, 1, 2, 2, 2, 3, 3});
+  LinkedList<string> b({"A", "A", "A", "B", "B", "B", "C", "C"});
+  CPPUNIT_ASSERT(LinkedList<int>({1, 1, 1, 2, 2, 2, 3, 3}) == a.remove(4, 1));
+  CPPUNIT_ASSERT(LinkedList<int>({1, 1, 1, 2, 2, 2, 3}) == a.remove(3, 1));
+  CPPUNIT_ASSERT(LinkedList<int>({1, 1, 1, 2, 2, 2, 3}) == a.remove(3, 0));
+  CPPUNIT_ASSERT(LinkedList<int>({1, 1, 1, 2, 2, 2}) == a.remove(3, 1));
+  CPPUNIT_ASSERT(LinkedList<int>({1, 2, 2, 2}) == a.remove(1, 2));
+  CPPUNIT_ASSERT(LinkedList<int>({2, 2, 2}) == a.remove(1, 2));
+  CPPUNIT_ASSERT(LinkedList<int>({}) == a.remove(2, -1));
+  CPPUNIT_ASSERT(LinkedList<int>({}) == a.remove(0, 1));
+  CPPUNIT_ASSERT(LinkedList<string>({"A", "A", "A", "B", "B", "B", "C", "C"}) == b.remove("D", 1));
+  CPPUNIT_ASSERT(LinkedList<string>({"A", "A", "A", "B", "B", "B", "C"}) == b.remove("C", 1));
+  CPPUNIT_ASSERT(LinkedList<string>({"A", "A", "A", "B", "B", "B", "C"}) == b.remove("C", 0));
+  CPPUNIT_ASSERT(LinkedList<string>({"A", "A", "A", "B", "B", "B"}) == b.remove("C", 1));
+  CPPUNIT_ASSERT(LinkedList<string>({"A", "B", "B", "B"}) == b.remove("A", 2));
+  CPPUNIT_ASSERT(LinkedList<string>({"B", "B", "B"}) == b.remove("A", 2));
+  CPPUNIT_ASSERT(LinkedList<string>({}) == b.remove("B", -1));
+  CPPUNIT_ASSERT(LinkedList<string>({}) == b.remove(" ", 1));
 }
 
 //-----------------------------------------------------------------------------
