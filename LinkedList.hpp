@@ -3,19 +3,26 @@
 
 #include <stddef.h>
 #include <initializer_list>
+#include "LinkedListIterator.hpp"
 #include "ListIndexOutOfBounds.hpp"
 #include "Node.hpp"
 
-template <class T>
+template <typename T>
 class LinkedList {
  public:
+  // Constructors
   LinkedList();
   LinkedList(const T&);
   LinkedList(const std::initializer_list<T>);
+
+  // Getters
   const T& getHead() const;
+  const T& getTail() const;
   const bool isEmpty() const;
-  const bool in(const T&)const;
-  const std::size_t length() const;
+  const bool contains(const T&) const;
+  const std::size_t size() const;
+
+  // Mutators
   LinkedList<T>& append(const T&);
   LinkedList<T>& prepend(const T&);
   LinkedList<T>& insert(const T&, const std::size_t);
@@ -24,11 +31,17 @@ class LinkedList {
   T remove(const std::size_t);
   LinkedList<T>& remove(const T&, const std::size_t);
 
-  bool operator==(const LinkedList&) const;
-  bool operator!=(const LinkedList&) const;
+  // Iterators
+  LinkedListIterator<T> begin() const;
+  const Node<T>* end() const;
+
+  // Operators
+  const bool operator==(const LinkedList&) const;
+  const bool operator!=(const LinkedList&) const;
   const T& operator[](const std::size_t) const;
   T& operator[](const std::size_t);
 
+  // Friend Operator
   friend std::ostream& operator<<(std::ostream& output,
                                   const LinkedList& self) {
     Node<T>* current = self.head;
@@ -46,134 +59,167 @@ class LinkedList {
 
  private:
   Node<T>* head;
+  Node<T>* tail;
+  std::size_t length;
 };
 
-template <class T>
-LinkedList<T>::LinkedList() : head(nullptr) {}
+template <typename T>
+LinkedList<T>::LinkedList() : head(nullptr), tail(nullptr), length(0) {}
 
-template <class T>
-LinkedList<T>::LinkedList(const T& data) : head(new Node<T>(data)) {}
+template <typename T>
+LinkedList<T>::LinkedList(const T& data)
+    : head(new Node<T>(data)), tail(this->head), length(1) {}
 
-template <class T>
-LinkedList<T>::LinkedList(const std::initializer_list<T> args) : head(nullptr) {
-  for (auto it = std::rbegin(args); it != std::rend(args); ++it)
+template <typename T>
+LinkedList<T>::LinkedList(const std::initializer_list<T> args)
+    : head(nullptr), tail(nullptr), length(0) {
+  for (auto it = std::rbegin(args); it != std::rend(args); ++it) {
     this->prepend(*it);
+    ++this->length;
+  }
 }
 
-template <class T>
+template <typename T>
 const bool LinkedList<T>::isEmpty() const {
+  return this->head == nullptr && this->tail == nullptr;
+}
+
+template <typename T>
+const bool LinkedList<T>::contains(const T& data) const {
   return this->head == nullptr;
 }
 
-template <class T>
+template <typename T>
 const T& LinkedList<T>::getHead() const {
   if (this->isEmpty()) throw ListIndexOutOfBounds();
   return this->head->data;
 }
 
-template <class T>
-const std::size_t LinkedList<T>::length() const {
-  std::size_t size = 0;
-  Node<T>* current = this->head;
-  while (current) {
-    ++size;
-    current = current->next;
-  }
-  return size;
+template <typename T>
+const T& LinkedList<T>::getTail() const {
+  if (this->isEmpty()) throw ListIndexOutOfBounds();
+  return this->tail->data;
 }
 
-template <class T>
+template <typename T>
+const std::size_t LinkedList<T>::size() const {
+  return this->length;
+}
+
+template <typename T>
 LinkedList<T>& LinkedList<T>::append(const T& data) {
-  if (this->isEmpty())
+  if (this->isEmpty()) {
     this->head = new Node<T>(data);
-  else {
-    Node<T>* current = this->head;
-    while (current->next) current = current->next;
-    current->next = new Node<T>(data);
+    this->tail = this->head;
+  } else {
+    this->tail->next = new Node<T>(data);
+    this->tail = this->tail->next;
   }
+  ++this->length;
   return *this;
 }
 
-template <class T>
+template <typename T>
 LinkedList<T>& LinkedList<T>::prepend(const T& data) {
   Node<T>* front = new Node<T>(data);
   front->next = this->head;
+  if (this->isEmpty()) this->tail = front;
   this->head = front;
+  ++this->length;
   return *this;
 }
 
-template <class T>
+template <typename T>
 LinkedList<T>& LinkedList<T>::insert(const T& data, const std::size_t index) {
+  if (index > this->length) throw ListIndexOutOfBounds(index, this->length);
   if (index == 0)
-    this->prepend(data);
+    return this->prepend(data);
+  else if (index == this->length)
+    return this->append(data);
   else {
     std::size_t position = 0;
     Node<T>* prior = this->head;
-    while (position < index - 1 && prior) {
+    while (position < index - 1) {
       ++position;
       prior = prior->next;
     }
-    if (position < index - 1) throw ListIndexOutOfBounds(index, position);
-    Node<T>* in = new Node<T>(data);
-    in->next = prior->next;
-    prior->next = in;
+    Node<T>* toAdd = new Node<T>(data);
+    toAdd->next = prior->next;
+    prior->next = toAdd;
+    ++this->length;
   }
   return *this;
 }
 
-template <class T>
+template <typename T>
 T LinkedList<T>::unappend() {
   if (this->isEmpty())
     throw ListIndexOutOfBounds(0, 0);
-  else {
+  else if (this->length == 1) {
+    T data = this->head->data;
+    delete this->head;
+    this->head = nullptr;
+    this->tail = nullptr;
+    --this->length;
+    return data;
+  } else {
     Node<T>* current = this->head;
     while (current->next->next) current = current->next;
-    T data = current->next->data;
-    delete current->next;
-    current->next = nullptr;
+    T data = this->tail->data;
+    delete this->tail;
+    this->tail = current;
+    --this->length;
     return data;
   }
 }
 
-template <class T>
+template <typename T>
 T LinkedList<T>::unprepend() {
   if (this->isEmpty())
     throw ListIndexOutOfBounds(0, 0);
-  else {
+  else if (this->length == 1) {
+    T data = this->head->data;
+    delete this->tail;
+    this->head = nullptr;
+    this->tail = nullptr;
+    --this->length;
+    return data;
+  } else {
     Node<T>* front = this->head->next;
     this->head->next = nullptr;
     T data = this->head->data;
     delete this->head;
     this->head = front;
+    --this->length;
     return data;
   }
 }
 
-template <class T>
+template <typename T>
 T LinkedList<T>::remove(const std::size_t index) {
-  if (index == 0)
+  if (index > this->length)
+    throw ListIndexOutOfBounds(index, this->length);
+  else if (index == 0)
     return this->unprepend();
+  else if (index == this->length)
+    return this->unappend();
   else {
     std::size_t position = 0;
     Node<T>* prior = this->head;
-    while (position < index - 1 && prior) {
+    while (position < index - 1) {
       ++position;
       prior = prior->next;
     }
-    if (!prior->next)
-      throw ListIndexOutOfBounds(index, position + 1);
-    else {
-      Node<T>* out = prior->next;
-      prior->next = prior->next->next;
-      out->next = nullptr;
-      T data = out->data;
-      delete out;
-      return data;
-    }
+    Node<T>* out = prior->next;
+    prior->next = prior->next->next;
+    out->next = nullptr;
+    T data = out->data;
+    delete out;
+    return data;
   }
 }
 
-template <class T>
+template <typename T>
 LinkedList<T>& LinkedList<T>::remove(const T& data, const std::size_t num) {
   Node<T>* current = this->head;
   std::size_t numRemoved = 0;
@@ -189,6 +235,7 @@ LinkedList<T>& LinkedList<T>::remove(const T& data, const std::size_t num) {
     while (numRemoved < num && current)
       if (current->data == data) {
         previous->next = current->next;
+        if (this->tail == current) this->tail = previous;
         delete current;
         current = previous->next;
         ++numRemoved;
@@ -197,12 +244,25 @@ LinkedList<T>& LinkedList<T>::remove(const T& data, const std::size_t num) {
         current = current->next;
       }
   }
+  this->length -= numRemoved;
   return *this;
 }
 
-template <class T>
-bool LinkedList<T>::operator==(const LinkedList<T>& other) const {
+template <typename T>
+LinkedListIterator<T> LinkedList<T>::begin() const {
+  return LinkedListIterator<T>(this->head);
+}
+
+template <typename T>
+const Node<T>* LinkedList<T>::end() const {
+  return this->tail;
+}
+
+template <typename T>
+const bool LinkedList<T>::operator==(const LinkedList<T>& other) const {
   if (this == &other) return true;
+  if (this->tail->data != other.tail->data || this->length != other.length)
+    return false;
   Node<T>* thisCurrent = this->head;
   Node<T>* otherCurrent = other.head;
   while (thisCurrent && otherCurrent) {
@@ -213,37 +273,43 @@ bool LinkedList<T>::operator==(const LinkedList<T>& other) const {
   return !(thisCurrent || otherCurrent);
 }
 
-template <class T>
-bool LinkedList<T>::operator!=(const LinkedList& other) const {
+template <typename T>
+const bool LinkedList<T>::operator!=(const LinkedList& other) const {
   return !this->operator==(other);
 }
 
-template <class T>
+template <typename T>
 const T& LinkedList<T>::operator[](const std::size_t index) const {
-  Node<T>* current = this->head;
-  std::size_t position = 0;
-  while (position < index && current) {
-    current = current->next;
-    ++position;
-  }
-  if (current)
+  if (index >= this->length)
+    throw ListIndexOutOfBounds(index, this->length);
+  else if (index == this->length - 1)
+    return this->tail->data;
+  else {
+    Node<T>* current = this->head;
+    std::size_t position = 0;
+    while (position < index) {
+      current = current->next;
+      ++position;
+    }
     return current->data;
-  else
-    throw ListIndexOutOfBounds(index, position);
+  }
 }
 
-template <class T>
+template <typename T>
 T& LinkedList<T>::operator[](const std::size_t index) {
-  Node<T>* current = this->head;
-  std::size_t position = 0;
-  while (position < index && current) {
-    current = current->next;
-    ++position;
-  }
-  if (current)
+  if (index >= this->length)
+    throw ListIndexOutOfBounds(index, this->length);
+  else if (index == this->length - 1)
+    return this->tail->data;
+  else {
+    Node<T>* current = this->head;
+    std::size_t position = 0;
+    while (position < index) {
+      current = current->next;
+      ++position;
+    }
     return current->data;
-  else
-    throw ListIndexOutOfBounds(index, position);
+  }
 }
 
 #endif

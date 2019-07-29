@@ -1,7 +1,7 @@
 #ifndef NODE_HPP
 #define NODE_HPP
 
-template <class T>
+template <typename T>
 struct Node {
   T data;
   Node* next;
@@ -13,7 +13,7 @@ struct Node {
   }
 };
 
-template <class T>
+template <typename T>
 Node<T>::Node(const T& data) : data(data), next(nullptr) {}
 
 #endif

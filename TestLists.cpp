@@ -29,7 +29,7 @@ class TestLists : public CppUnit::TestFixture {
   CPPUNIT_TEST(testLinkedListEquality);
   CPPUNIT_TEST(testLinkedListIsEmpty);
   CPPUNIT_TEST(testLinkedListGetHead);
-  CPPUNIT_TEST(testLinkedListLength);
+  CPPUNIT_TEST(testLinkedListSize);
   CPPUNIT_TEST(testLinkedListAppend);
   CPPUNIT_TEST(testLinkedListPrepend);
   CPPUNIT_TEST(testLinkedListInsert);
@@ -44,7 +44,7 @@ class TestLists : public CppUnit::TestFixture {
   void testLinkedListEquality(void);
   void testLinkedListIsEmpty(void);
   void testLinkedListGetHead(void);
-  void testLinkedListLength(void);
+  void testLinkedListSize(void);
   void testLinkedListAppend(void);
   void testLinkedListPrepend(void);
   void testLinkedListInsert(void);
@@ -113,15 +113,15 @@ void TestLists::testLinkedListGetHead(void) {
   CPPUNIT_ASSERT("B" == LinkedList<string>({"B", "A"}).getHead());
 }
 
-void TestLists::testLinkedListLength(void) {
-  CPPUNIT_ASSERT(0 == LinkedList<int>().length());
-  CPPUNIT_ASSERT(1 == LinkedList<int>(1).length());
-  CPPUNIT_ASSERT(2 == LinkedList<int>({1, 1}).length());
-  CPPUNIT_ASSERT(2 == LinkedList<int>({1, 2}).length());
-  CPPUNIT_ASSERT(0 == LinkedList<string>().length());
-  CPPUNIT_ASSERT(1 == LinkedList<string>("A").length());
-  CPPUNIT_ASSERT(2 == LinkedList<string>({"A", "A"}).length());
-  CPPUNIT_ASSERT(2 == LinkedList<string>({"B", "B"}).length());
+void TestLists::testLinkedListSize(void) {
+  CPPUNIT_ASSERT(0 == LinkedList<int>().size());
+  CPPUNIT_ASSERT(1 == LinkedList<int>(1).size());
+  CPPUNIT_ASSERT(2 == LinkedList<int>({1, 1}).size());
+  CPPUNIT_ASSERT(2 == LinkedList<int>({1, 2}).size());
+  CPPUNIT_ASSERT(0 == LinkedList<string>().size());
+  CPPUNIT_ASSERT(1 == LinkedList<string>("A").size());
+  CPPUNIT_ASSERT(2 == LinkedList<string>({"A", "A"}).size());
+  CPPUNIT_ASSERT(2 == LinkedList<string>({"B", "B"}).size());
 }
 
 void TestLists::testLinkedListAppend(void) {
