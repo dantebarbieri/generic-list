@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding='ISO-8859-1' standalone='yes' ?>
+<TestRun>
+  <FailedTests></FailedTests>
+  <SuccessfulTests>
+    <Test id="1">
+      <Name>TestLists::testNodeConstructor</Name>
+    </Test>
+    <Test id="2">
+      <Name>TestLists::testLinkedListEquality</Name>
+    </Test>
+    <Test id="3">
+      <Name>TestLists::testLinkedListIsEmpty</Name>
+    </Test>
+    <Test id="4">
+      <Name>TestLists::testLinkedListGetHead</Name>
+    </Test>
+    <Test id="5">
+      <Name>TestLists::testLinkedListLength</Name>
+    </Test>
+    <Test id="6">
+      <Name>TestLists::testLinkedListAppend</Name>
+    </Test>
+    <Test id="7">
+      <Name>TestLists::testLinkedListPrepend</Name>
+    </Test>
+    <Test id="8">
+      <Name>TestLists::testLinkedListInsert</Name>
+    </Test>
+    <Test id="9">
+      <Name>TestLists::testLinkedListOutput</Name>
+    </Test>
+    <Test id="10">
+      <Name>TestLists::testLinkedListAccess</Name>
+    </Test>
+    <Test id="11">
+      <Name>TestLists::testLinkedListRemoveSingle</Name>
+    </Test>
+    <Test id="12">
+      <Name>TestLists::testLinkedListRemoveMultiple</Name>
+    </Test>
+  </SuccessfulTests>
+  <Statistics>
+    <Tests>12</Tests>
+    <FailuresTotal>0</FailuresTotal>
+    <Errors>0</Errors>
+    <Failures>0</Failures>
+  </Statistics>
+</TestRun>
