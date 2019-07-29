@@ -30,6 +30,7 @@
 *.exe
 *.out
 *.app
+testLists
 
 # VS Code Settings
 .vscode
