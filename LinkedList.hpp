@@ -14,14 +14,15 @@ class LinkedList {
   LinkedList(const std::initializer_list<T>);
   const T& getHead() const;
   const bool isEmpty() const;
+  const bool in(const T&)const;
   const std::size_t length() const;
-  void append(const T&);
-  void prepend(const T&);
-  void insert(const T&, const std::size_t);
+  LinkedList<T>& append(const T&);
+  LinkedList<T>& prepend(const T&);
+  LinkedList<T>& insert(const T&, const std::size_t);
   T unappend();
   T unprepend();
   T remove(const std::size_t);
-  void remove(const T&, const std::size_t);
+  LinkedList<T>& remove(const T&, const std::size_t);
 
   bool operator==(const LinkedList&) const;
   bool operator!=(const LinkedList&) const;
@@ -82,7 +83,7 @@ const std::size_t LinkedList<T>::length() const {
 }
 
 template <class T>
-void LinkedList<T>::append(const T& data) {
+LinkedList<T>& LinkedList<T>::append(const T& data) {
   if (this->isEmpty())
     this->head = new Node<T>(data);
   else {
@@ -90,17 +91,19 @@ void LinkedList<T>::append(const T& data) {
     while (current->next) current = current->next;
     current->next = new Node<T>(data);
   }
+  return *this;
 }
 
 template <class T>
-void LinkedList<T>::prepend(const T& data) {
+LinkedList<T>& LinkedList<T>::prepend(const T& data) {
   Node<T>* front = new Node<T>(data);
   front->next = this->head;
   this->head = front;
+  return *this;
 }
 
 template <class T>
-void LinkedList<T>::insert(const T& data, const std::size_t index) {
+LinkedList<T>& LinkedList<T>::insert(const T& data, const std::size_t index) {
   if (index == 0)
     this->prepend(data);
   else {
@@ -115,6 +118,7 @@ void LinkedList<T>::insert(const T& data, const std::size_t index) {
     in->next = prior->next;
     prior->next = in;
   }
+  return *this;
 }
 
 template <class T>
@@ -148,7 +152,7 @@ T LinkedList<T>::unprepend() {
 template <class T>
 T LinkedList<T>::remove(const std::size_t index) {
   if (index == 0)
-    this->unprepend();
+    return this->unprepend();
   else {
     std::size_t position = 0;
     Node<T>* prior = this->head;
@@ -156,18 +160,21 @@ T LinkedList<T>::remove(const std::size_t index) {
       ++position;
       prior = prior->next;
     }
-    if (position < index - 1) throw ListIndexOutOfBounds(index, position);
-    Node<T>* out = prior->next;
-    prior->next = prior->next->next;
-    out->next = nullptr;
-    T data = out->data;
-    delete out;
-    return data;
+    if (!prior->next)
+      throw ListIndexOutOfBounds(index, position + 1);
+    else {
+      Node<T>* out = prior->next;
+      prior->next = prior->next->next;
+      out->next = nullptr;
+      T data = out->data;
+      delete out;
+      return data;
+    }
   }
 }
 
 template <class T>
-void LinkedList<T>::remove(const T& data, const std::size_t num) {
+LinkedList<T>& LinkedList<T>::remove(const T& data, const std::size_t num) {
   Node<T>* current = this->head;
   std::size_t numRemoved = 0;
   while (numRemoved < num && current && current->data == data) {
@@ -179,7 +186,7 @@ void LinkedList<T>::remove(const T& data, const std::size_t num) {
   if (current) {
     Node<T>* previous = current;
     current = current->next;
-    while (numRemoved < num && current) {
+    while (numRemoved < num && current)
       if (current->data == data) {
         previous->next = current->next;
         delete current;
@@ -189,8 +196,8 @@ void LinkedList<T>::remove(const T& data, const std::size_t num) {
         previous = previous->next;
         current = current->next;
       }
-    }
   }
+  return *this;
 }
 
 template <class T>
@@ -203,8 +210,7 @@ bool LinkedList<T>::operator==(const LinkedList<T>& other) const {
     thisCurrent = thisCurrent->next;
     otherCurrent = otherCurrent->next;
   }
-  if (thisCurrent || otherCurrent) return false;
-  return true;
+  return !(thisCurrent || otherCurrent);
 }
 
 template <class T>
@@ -220,8 +226,10 @@ const T& LinkedList<T>::operator[](const std::size_t index) const {
     current = current->next;
     ++position;
   }
-  if (current) return current->data;
-  throw ListIndexOutOfBounds(index, position);
+  if (current)
+    return current->data;
+  else
+    throw ListIndexOutOfBounds(index, position);
 }
 
 template <class T>
@@ -232,8 +240,10 @@ T& LinkedList<T>::operator[](const std::size_t index) {
     current = current->next;
     ++position;
   }
-  if (current) return current->data;
-  throw ListIndexOutOfBounds(index, position);
+  if (current)
+    return current->data;
+  else
+    throw ListIndexOutOfBounds(index, position);
 }
 
 #endif
